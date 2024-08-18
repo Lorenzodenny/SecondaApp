@@ -1,0 +1,38 @@
+﻿CREATE PROCEDURE DeleteProdotto
+    @Id INT
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        DELETE FROM Prodotti WHERE Id = @Id;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore
+        THROW;
+    END CATCH
+END
+
+
+ALTER PROCEDURE DeleteProdotto
+    @Id INT
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        DELETE FROM Prodotti WHERE Id = @Id;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore
+        THROW;
+    END CATCH
+END

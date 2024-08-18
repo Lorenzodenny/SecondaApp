@@ -1,0 +1,44 @@
+﻿CREATE PROCEDURE AddProdotto
+    @Nome NVARCHAR(100),
+    @Descrizione NVARCHAR(500),
+    @Prezzo DECIMAL(18, 2)
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        INSERT INTO Prodotti (Nome, Descrizione, Prezzo)
+        VALUES (@Nome, @Descrizione, @Prezzo);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore
+        THROW;
+    END CATCH
+END
+
+
+ALTER PROCEDURE AddProdotto
+    @Nome NVARCHAR(100),
+    @Descrizione NVARCHAR(500),
+    @Prezzo DECIMAL(18, 2)
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        INSERT INTO Prodotti (Nome, Descrizione, Prezzo)
+        VALUES (@Nome, @Descrizione, @Prezzo);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore
+        THROW;
+    END CATCH
+END

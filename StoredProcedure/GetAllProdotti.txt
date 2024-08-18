@@ -1,0 +1,36 @@
+﻿CREATE PROCEDURE GetAllProdotti
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        SELECT * FROM Prodotti;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore (puoi aggiungere un logging o altro qui)
+        THROW;
+    END CATCH
+END
+
+
+ALTER PROCEDURE GetAllProdotti
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        SELECT * FROM Prodotti;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore (puoi aggiungere un logging o altro qui)
+        THROW;
+    END CATCH
+END

@@ -1,0 +1,48 @@
+﻿CREATE PROCEDURE UpdateProdotto
+    @Id INT,
+    @Nome NVARCHAR(100),
+    @Descrizione NVARCHAR(500),
+    @Prezzo DECIMAL(18, 2)
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        UPDATE Prodotti
+        SET Nome = @Nome, Descrizione = @Descrizione, Prezzo = @Prezzo
+        WHERE Id = @Id;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore
+        THROW;
+    END CATCH
+END
+
+
+ALTER PROCEDURE UpdateProdotto
+    @Id INT,
+    @Nome NVARCHAR(100),
+    @Descrizione NVARCHAR(500),
+    @Prezzo DECIMAL(18, 2)
+AS
+BEGIN
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        UPDATE Prodotti
+        SET Nome = @Nome, Descrizione = @Descrizione, Prezzo = @Prezzo
+        WHERE Id = @Id;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Gestione dell'errore
+        THROW;
+    END CATCH
+END
