@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SecondaApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Ciao")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProdottoCategoriaViewController : ControllerBase

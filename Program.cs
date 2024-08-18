@@ -18,7 +18,36 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Your API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Please insert JWT with Bearer into field. Example: 'Bearer your_token_here'",
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
+
 
 // Configurazione del DbContext con Identity
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -68,11 +97,53 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IProdottoCategoriaViewRepository, ProdottoCategoriaViewRepository>();
 builder.Services.AddScoped<IProdottoCategoriaViewService, ProdottoCategoriaViewService>();
 
+// Registro il servizio per le email
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 
 // Registro UnitOfWork interfaccia per transizioni
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Configurazione dei ruoli di default
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    string[] roleNames = { "Admin", "User" };
+    foreach (var roleName in roleNames)
+    {
+        var roleExist = await roleManager.RoleExistsAsync(roleName);
+        if (!roleExist)
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+
+    var adminEmail = "admin@yourapp.com";
+    var adminPassword = "Admin123!";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            Nome = "AdminNome", // Aggiungi un nome predefinito
+            Cognome = "AdminCognome", // Aggiungi un cognome predefinito
+            NumeroDiTelefono = "3334747806"
+        };
+        var createAdmin = await userManager.CreateAsync(adminUser, adminPassword);
+        if (createAdmin.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
